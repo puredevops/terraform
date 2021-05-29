@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source = "../../modules/vpc"
   name = "my-vpc"
   cidr = "10.0.0.0/16"
   azs             = ["eu-west-1a"]
@@ -14,5 +14,28 @@ module "vpc" {
     Terraform = "true"
     Environment = "dev"
   }
+}
+
+locals {
+  cluster_name = "my-eks-cluster"
+}
+
+module "eks" {
+  source       = "../../modules/eks"
+  cluster_name = local.cluster_name
+  vpc_id       = module.vpc.aws_vpc_id
+  subnets      = aws_subnet.private.*.id
+
+  node_groups = {
+    eks_nodes = {
+      desired_capacity = 3
+      max_capacity     = 3
+      min_capaicty     = 3
+
+      instance_type = "t2.small"
+    }
+  }
+
+  manage_aws_auth = false
 }
 
