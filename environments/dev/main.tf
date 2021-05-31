@@ -23,8 +23,9 @@ locals {
 module "eks" {
   source       = "../../modules/eks"
   cluster_name = local.cluster_name
-  vpc_id       = module.vpc.aws_vpc_id
-  subnets      = aws_subnet.private.*.id
+  vpc_id       = module.vpc.vpc_id
+  subnets      = module.vpc.private_subnets
+  cluster_version = "1.19"
 
   node_groups = {
     eks_nodes = {
